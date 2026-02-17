@@ -1,4 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Farm Game</title>
+
+<style>
+body {
+    font-family: Arial;
+    text-align: center;
+    background: #87ceeb;
+}
+
+h1 {
+    color: white;
+}
+
+.farm {
+    width: 200px;
+    height: 200px;
+    background: brown;
+    margin: 20px auto;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
 <h1>Coin: <span id="coin">0</span></h1>
+
+<div class="farm" id="farm">
+    Boş torpaq
+</div>
+
 <button onclick="plant()">Ək</button>
 <button onclick="harvest()">Topla</button>
 
@@ -7,14 +52,24 @@ let coin = 0;
 let ready = false;
 
 function plant(){
+    document.getElementById("farm").innerText = "Əkilir...";
     ready = false;
-    setTimeout(()=> ready=true, 60000);
+
+    setTimeout(()=>{
+        ready = true;
+        document.getElementById("farm").innerText = "Hazırdır 🌾";
+    }, 5000);
 }
 
 function harvest(){
     if(ready){
         coin += 10;
         document.getElementById("coin").innerText = coin;
+        document.getElementById("farm").innerText = "Boş torpaq";
+        ready = false;
     }
 }
 </script>
+
+</body>
+</html>
