@@ -1,0 +1,32 @@
+index.html
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Farm Game</title>
+</head>
+<body>
+
+<h1>Coin: <span id="coin">0</span></h1>
+<button onclick="plant()">Ək</button>
+<button onclick="harvest()">Topla</button>
+
+<script>
+let coin = 0;
+let ready = false;
+
+function plant(){
+    ready = false;
+    setTimeout(()=> ready=true, 5000);
+}
+
+function harvest(){
+    if(ready){
+        coin += 10;
+        document.getElementById("coin").innerText = coin;
+    }
+}
+</script>
+
+</body>
+</html>
