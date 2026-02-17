@@ -73,3 +73,118 @@ function harvest(){
 
 </body>
 </html>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Farm Game</title>
+
+<style>
+body{
+    font-family: Arial;
+    text-align:center;
+    background:#6ecb63;
+}
+
+.top{
+    color:white;
+    font-size:20px;
+    margin:10px;
+}
+
+.farm{
+    display:grid;
+    grid-template-columns:repeat(2,120px);
+    gap:15px;
+    justify-content:center;
+    margin-top:20px;
+}
+
+.field{
+    width:120px;
+    height:120px;
+    background:brown;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    color:white;
+}
+.locked{
+    background:gray;
+}
+button{
+    margin-top:10px;
+    padding:10px 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top">
+Coin: <span id="coin">0</span> |
+Level: <span id="level">1</span>
+</div>
+
+<div class="farm">
+    <div class="field" onclick="plant(0)">🌱</div>
+    <div class="field locked" onclick="unlock(1)">🔒</div>
+    <div class="field locked" onclick="unlock(2)">🔒</div>
+    <div class="field locked" onclick="unlock(3)">🔒</div>
+</div>
+
+<script>
+let coin = 0;
+let level = 1;
+
+let fields = [
+ {open:true, ready:false},
+ {open:false},
+ {open:false},
+ {open:false}
+];
+
+function plant(id){
+ if(!fields[id].open) return;
+
+ fields[id].ready=false;
+ event.target.innerText="🌱";
+
+ setTimeout(()=>{
+   fields[id].ready=true;
+   event.target.innerText="🌾";
+ },3000);
+}
+
+function unlock(id){
+ if(fields[id].open) return;
+
+ if(coin>=50){
+   coin-=50;
+   fields[id].open=true;
+   event.target.classList.remove("locked");
+   event.target.innerText="🌱";
+   update();
+ } else {
+   alert("Coin çatmır");
+ }
+}
+
+document.addEventListener("click",function(e){
+ if(e.target.innerText=="🌾"){
+   coin+=10;
+   e.target.innerText="🌱";
+   update();
+ }
+});
+
+function update(){
+ document.getElementById("coin").innerText=coin;
+ document.getElementById("level").innerText=level;
+}
+</script>
+
+</body>
+</html>
