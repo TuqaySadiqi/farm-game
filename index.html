@@ -4,22 +4,27 @@
 <meta charset="UTF-8">
 <title>Farm Game</title>
 
-<style> #loading-screen{
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(#87ceeb,#6ecb63);
+    text-align:center;
+}
+
+/* LOADING SCREEN */
+
+#loading-screen{
     position:fixed;
-    top:0;
-    left:0;
     width:100%;
     height:100%;
-    background:#6ecb63;
+    background:#4CAF50;
     display:flex;
     align-items:center;
     justify-content:center;
-    z-index:9999;
-}
-
-.loader-box{
-    text-align:center;
+    flex-direction:column;
     color:white;
+    z-index:9999;
 }
 
 .spinner{
@@ -28,13 +33,13 @@
     border:6px solid rgba(255,255,255,0.3);
     border-top:6px solid white;
     border-radius:50%;
-    margin:0 auto 20px auto;
     animation:spin 1s linear infinite;
+    margin-bottom:20px;
 }
 
 @keyframes spin{
-    0%{ transform:rotate(0deg); }
-    100%{ transform:rotate(360deg); }
+    0%{transform:rotate(0deg);}
+    100%{transform:rotate(360deg);}
 }
 
 .progress{
@@ -43,7 +48,6 @@
     background:rgba(255,255,255,0.3);
     border-radius:10px;
     overflow:hidden;
-    margin-top:15px;
 }
 
 #progress-bar{
@@ -52,210 +56,176 @@
     background:white;
 }
 
-    
-body <div id="loading-screen">
-    <div class="loader-box">
-        <div class="spinner"></div>
-        <h2>Farm Game yüklənir...</h2>
-        <div class="progress">
-            <div id="progress-bar"></div>
-        </div>
-    </div>
-</div>
-
-      
-    font-family: Arial;
-    text-align: center;
-    background: #87ceeb;
-}
-
-h1 {
-    color: white;
-}
-
-.farm {
-    width: 200px;
-    height: 200px;
-    background: brown;
-    margin: 20px auto;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 20px;
-}
-
-button {
-    padding: 10px 20px;
-    margin: 10px;
-    font-size: 16px;
-}
-</style>
-</head>
-
-<body>
-
-<h1>Coin: <span id="coin">0</span></h1>
-
-<div class="farm" id="farm">
-    Boş torpaq
-</div>
-
-<button onclick="plant()">Ək</button>
-<button onclick="harvest()">Topla</button>
-
-<script>
-let progress = 0;
-
-let loadingInterval = setInterval(() => {
-    progress += 5;
-    document.getElementById("progress-bar").style.width = progress + "%";
-
-    if(progress >= 100){
-        clearInterval(loadingInterval);
-
-        document.getElementById("loading-screen").style.opacity = "0";
-
-        setTimeout(()=>{
-            document.getElementById("loading-screen").style.display = "none";
-        },500);
-    }
-},100);
-    
-function plant(){
-    document.getElementById("farm").innerText = "Əkilir...";
-    ready = false;
-
-    setTimeout(()=>{
-        ready = true;
-        document.getElementById("farm").innerText = "Hazırdır 🌾";
-    }, 5000);
-}
-
-function harvest(){
-    if(ready){
-        coin += 10;
-        document.getElementById("coin").innerText = coin;
-        document.getElementById("farm").innerText = "Boş torpaq";
-        ready = false;
-    }
-}
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Farm Game</title>
-
-<style>
-body{
-    font-family: Arial;
-    text-align:center;
-    background:#6ecb63;
-}
+/* GAME UI */
 
 .top{
     color:white;
-    font-size:20px;
-    margin:10px;
+    font-size:18px;
+    padding:10px;
 }
 
 .farm{
     display:grid;
-    grid-template-columns:repeat(2,120px);
-    gap:15px;
+    grid-template-columns:repeat(2,140px);
+    gap:20px;
     justify-content:center;
     margin-top:20px;
 }
 
 .field{
-    width:120px;
-    height:120px;
-    background:brown;
-    border-radius:10px;
+    width:140px;
+    height:140px;
+    background:#8B4513;
+    border-radius:15px;
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:30px;
+    font-size:40px;
     color:white;
+    box-shadow:0 5px 10px rgba(0,0,0,0.3);
 }
+
 .locked{
     background:gray;
-}
-button{
-    margin-top:10px;
-    padding:10px 20px;
 }
 </style>
 </head>
 
 <body>
+
+<div id="loading-screen">
+    <div class="spinner"></div>
+    <h2>Farm yüklənir...</h2>
+    <div class="progress">
+        <div id="progress-bar"></div>
+    </div>
+</div>
 
 <div class="top">
 Coin: <span id="coin">0</span> |
 Level: <span id="level">1</span>
 </div>
 
-<div class="farm">
-    <div class="field" onclick="plant(0)">🌱</div>
-    <div class="field locked" onclick="unlock(1)">🔒</div>
-    <div class="field locked" onclick="unlock(2)">🔒</div>
-    <div class="field locked" onclick="unlock(3)">🔒</div>
-</div>
+<div class="farm" id="farm"></div>
 
 <script>
-let coin = 0;
-let level = 1;
 
-let fields = [
+/* LOAD SAVE DATA */
+
+let coin = localStorage.getItem("coin") ? parseInt(localStorage.getItem("coin")) : 0;
+let level = localStorage.getItem("level") ? parseInt(localStorage.getItem("level")) : 1;
+
+let fields = localStorage.getItem("fields") ?
+JSON.parse(localStorage.getItem("fields")) :
+[
  {open:true, ready:false},
  {open:false},
  {open:false},
  {open:false}
 ];
 
+function saveGame(){
+    localStorage.setItem("coin",coin);
+    localStorage.setItem("level",level);
+    localStorage.setItem("fields",JSON.stringify(fields));
+}
+
+/* RENDER FARM */
+
+function renderFarm(){
+    const farm = document.getElementById("farm");
+    farm.innerHTML="";
+
+    fields.forEach((f,index)=>{
+
+        let div=document.createElement("div");
+        div.classList.add("field");
+
+        if(!f.open){
+            div.classList.add("locked");
+            div.innerText="🔒";
+            div.onclick=()=>unlockField(index);
+        }else if(f.ready){
+            div.innerText="🌾";
+            div.onclick=()=>harvest(index);
+        }else{
+            div.innerText="🌱";
+            div.onclick=()=>plant(index);
+        }
+
+        farm.appendChild(div);
+    });
+
+    document.getElementById("coin").innerText=coin;
+    document.getElementById("level").innerText=level;
+}
+
+/* GAME LOGIC */
+
 function plant(id){
- if(!fields[id].open) return;
+    if(!fields[id].open) return;
 
- fields[id].ready=false;
- event.target.innerText="🌱";
+    fields[id].ready=false;
+    renderFarm();
 
- setTimeout(()=>{
-   fields[id].ready=true;
-   event.target.innerText="🌾";
- },3000);
+    setTimeout(()=>{
+        fields[id].ready=true;
+        renderFarm();
+        saveGame();
+    },3000);
 }
 
-function unlock(id){
- if(fields[id].open) return;
+function harvest(id){
+    coin+=10;
+    fields[id].ready=false;
 
- if(coin>=50){
-   coin-=50;
-   fields[id].open=true;
-   event.target.classList.remove("locked");
-   event.target.innerText="🌱";
-   update();
- } else {
-   alert("Coin çatmır");
- }
+    if(coin>=level*50){
+        level++;
+    }
+
+    renderFarm();
+    saveGame();
 }
 
-document.addEventListener("click",function(e){
- if(e.target.innerText=="🌾"){
-   coin+=10;
-   e.target.innerText="🌱";
-   update();
- }
+function unlockField(id){
+
+    let cost = (id+1)*50;
+
+    if(level>=id+1 && coin>=cost){
+        coin-=cost;
+        fields[id].open=true;
+        saveGame();
+        renderFarm();
+    }else{
+        alert("Level və ya coin çatmır!");
+    }
+}
+
+/* LOADING ANIMATION */
+
+window.addEventListener("load",()=>{
+
+    let progress=0;
+
+    let interval=setInterval(()=>{
+        progress+=5;
+        document.getElementById("progress-bar").style.width=progress+"%";
+
+        if(progress>=100){
+            clearInterval(interval);
+            setTimeout(()=>{
+                document.getElementById("loading-screen").style.display="none";
+            },500);
+        }
+
+    },60);
+
 });
 
-function update(){
- document.getElementById("coin").innerText=coin;
- document.getElementById("level").innerText=level;
-}
+/* INIT */
+
+renderFarm();
+
 </script>
 
 </body>
