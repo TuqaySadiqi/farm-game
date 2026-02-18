@@ -162,6 +162,10 @@ body{
 </div>
 
 <div class="top">
+<span onclick="openProfile()" style="cursor:pointer">
+👤 Profile
+</span>
+<br>
 Coin: <span id="coin">0</span> |
 Level: <span id="level">1</span>
 </div>
@@ -169,7 +173,16 @@ Level: <span id="level">1</span>
 <div class="farm" id="farm"></div>
 
 <script>
+function openProfile(){
+    document.getElementById("profileBox").style.display="flex";
+    document.getElementById("pLevel").innerText=level;
+    document.getElementById("pCoin").innerText=coin;
+}
 
+function closeProfile(){
+    document.getElementById("profileBox").style.display="none";
+}
+    
 /* LOAD SAVE */
 
 let coin = localStorage.getItem("coin") ? parseInt(localStorage.getItem("coin")) : 0;
