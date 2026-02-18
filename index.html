@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Farm Game</title>
 
-<style> #loading{
+<style> #loading-screen{
     position:fixed;
     top:0;
     left:0;
@@ -14,14 +14,55 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    color:white;
-    font-size:24px;
-    z-index:999;
+    z-index:9999;
 }
+
+.loader-box{
+    text-align:center;
+    color:white;
+}
+
+.spinner{
+    width:60px;
+    height:60px;
+    border:6px solid rgba(255,255,255,0.3);
+    border-top:6px solid white;
+    border-radius:50%;
+    margin:0 auto 20px auto;
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+    0%{ transform:rotate(0deg); }
+    100%{ transform:rotate(360deg); }
+}
+
+.progress{
+    width:200px;
+    height:10px;
+    background:rgba(255,255,255,0.3);
+    border-radius:10px;
+    overflow:hidden;
+    margin-top:15px;
+}
+
+#progress-bar{
+    width:0%;
+    height:100%;
+    background:white;
+}
+
     
-body {<div id="loading">
-    <h2>Yüklənir...</h2>
+body <div id="loading-screen">
+    <div class="loader-box">
+        <div class="spinner"></div>
+        <h2>Farm Game yüklənir...</h2>
+        <div class="progress">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
 </div>
+
       
     font-family: Arial;
     text-align: center;
@@ -65,11 +106,22 @@ button {
 <button onclick="harvest()">Topla</button>
 
 <script>
-let coin = 0;
-let ready = false;
-window.onload = function(){
-    document.getElementById("loading").style.display = "none";
+let progress = 0;
+
+let loadingInterval = setInterval(() => {
+    progress += 5;
+    document.getElementById("progress-bar").style.width = progress + "%";
+
+    if(progress >= 100){
+        clearInterval(loadingInterval);
+
+        document.getElementById("loading-screen").style.opacity = "0";
+
+        setTimeout(()=>{
+            document.getElementById("loading-screen").style.display = "none";
+        },500);
     }
+},100);
     
 function plant(){
     document.getElementById("farm").innerText = "Əkilir...";
