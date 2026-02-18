@@ -8,11 +8,45 @@
 body{
     margin:0;
     font-family:Arial;
+    overflow-x:hidden;
     background:linear-gradient(#87ceeb,#6ecb63);
     text-align:center;
 }
 
-/* LOADING SCREEN */
+/* MOVING CLOUDS */
+
+.cloud{
+    position:absolute;
+    top:20px;
+    width:120px;
+    height:60px;
+    background:white;
+    border-radius:50px;
+    opacity:0.8;
+    animation:cloudMove 30s linear infinite;
+}
+
+.cloud:before,
+.cloud:after{
+    content:"";
+    position:absolute;
+    background:white;
+    width:70px;
+    height:70px;
+    border-radius:50%;
+}
+
+.cloud:before{ top:-30px; left:10px; }
+.cloud:after{ top:-20px; right:10px; }
+
+.cloud2{ top:80px; animation-duration:45s; }
+
+@keyframes cloudMove{
+    from{ transform:translateX(-200px); }
+    to{ transform:translateX(110vw); }
+}
+
+/* LOADING */
 
 #loading-screen{
     position:fixed;
@@ -56,7 +90,7 @@ body{
     background:white;
 }
 
-/* GAME UI */
+/* UI */
 
 .top{
     color:white;
@@ -66,32 +100,58 @@ body{
 
 .farm{
     display:grid;
-    grid-template-columns:repeat(2,140px);
+    grid-template-columns:repeat(2,150px);
     gap:20px;
     justify-content:center;
     margin-top:20px;
 }
 
+/* REAL FARM FIELD DESIGN */
+
 .field{
-    width:140px;
-    height:140px;
-    background:#8B4513;
-    border-radius:15px;
+    width:150px;
+    height:150px;
+    border-radius:20px;
+    background:
+      repeating-linear-gradient(
+        45deg,
+        #7a4b20,
+        #7a4b20 10px,
+        #8b5a2b 10px,
+        #8b5a2b 20px
+      );
     display:flex;
     align-items:center;
     justify-content:center;
     font-size:40px;
     color:white;
-    box-shadow:0 5px 10px rgba(0,0,0,0.3);
+    box-shadow:0 6px 12px rgba(0,0,0,0.3);
+    position:relative;
 }
 
 .locked{
     background:gray;
 }
+
+/* COIN ANIMATION */
+
+.coinFly{
+    position:absolute;
+    font-size:22px;
+    animation:coinFly 1s ease-out forwards;
+}
+
+@keyframes coinFly{
+    0%{ transform:translateY(0); opacity:1; }
+    100%{ transform:translateY(-80px); opacity:0; }
+}
 </style>
 </head>
 
 <body>
+
+<div class="cloud"></div>
+<div class="cloud cloud2"></div>
 
 <div id="loading-screen">
     <div class="spinner"></div>
@@ -110,7 +170,7 @@ Level: <span id="level">1</span>
 
 <script>
 
-/* LOAD SAVE DATA */
+/* LOAD SAVE */
 
 let coin = localStorage.getItem("coin") ? parseInt(localStorage.getItem("coin")) : 0;
 let level = localStorage.getItem("level") ? parseInt(localStorage.getItem("level")) : 1;
@@ -130,14 +190,13 @@ function saveGame(){
     localStorage.setItem("fields",JSON.stringify(fields));
 }
 
-/* RENDER FARM */
+/* RENDER */
 
 function renderFarm(){
-    const farm = document.getElementById("farm");
+    const farm=document.getElementById("farm");
     farm.innerHTML="";
 
     fields.forEach((f,index)=>{
-
         let div=document.createElement("div");
         div.classList.add("field");
 
@@ -145,10 +204,12 @@ function renderFarm(){
             div.classList.add("locked");
             div.innerText="🔒";
             div.onclick=()=>unlockField(index);
-        }else if(f.ready){
+        }
+        else if(f.ready){
             div.innerText="🌾";
-            div.onclick=()=>harvest(index);
-        }else{
+            div.onclick=()=>harvest(index,div);
+        }
+        else{
             div.innerText="🌱";
             div.onclick=()=>plant(index);
         }
@@ -160,7 +221,7 @@ function renderFarm(){
     document.getElementById("level").innerText=level;
 }
 
-/* GAME LOGIC */
+/* GAME */
 
 function plant(id){
     if(!fields[id].open) return;
@@ -175,21 +236,21 @@ function plant(id){
     },3000);
 }
 
-function harvest(id){
+function harvest(id,element){
+
     coin+=10;
     fields[id].ready=false;
 
-    if(coin>=level*50){
-        level++;
-    }
+    if(coin>=level*50) level++;
+
+    coinAnimation(element);
 
     renderFarm();
     saveGame();
 }
 
 function unlockField(id){
-
-    let cost = (id+1)*50;
+    let cost=(id+1)*50;
 
     if(level>=id+1 && coin>=cost){
         coin-=cost;
@@ -201,12 +262,21 @@ function unlockField(id){
     }
 }
 
-/* LOADING ANIMATION */
+/* COIN FLY EFFECT */
+
+function coinAnimation(el){
+    let coinEl=document.createElement("div");
+    coinEl.innerText="💰+10";
+    coinEl.className="coinFly";
+    el.appendChild(coinEl);
+
+    setTimeout(()=>coinEl.remove(),1000);
+}
+
+/* LOADING */
 
 window.addEventListener("load",()=>{
-
     let progress=0;
-
     let interval=setInterval(()=>{
         progress+=5;
         document.getElementById("progress-bar").style.width=progress+"%";
@@ -217,12 +287,8 @@ window.addEventListener("load",()=>{
                 document.getElementById("loading-screen").style.display="none";
             },500);
         }
-
     },60);
-
 });
-
-/* INIT */
 
 renderFarm();
 
