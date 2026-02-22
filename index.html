@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Bakery Game</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(#87CEEB,#e6f5d0);
+  overflow:hidden;
+}
+
+#game{
+  position:relative;
+  width:100%;
+  height:100vh;
+  text-align:center;
+}
+
+/* TOP BAKERY */
+#bakery{
+  position:absolute;
+  top:5%;
+  left:50%;
+  transform:translateX(-50%);
+  width:260px;
+  height:150px;
+  background:linear-gradient(#ffb347,#ff7b00);
+  border-radius:25px;
+  box-shadow:0 10px 20px rgba(0,0,0,0.3);
+  color:white;
+  font-size:22px;
+  font-weight:bold;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* MILL */
+#mill{
+  position:absolute;
+  bottom:15%;
+  left:50%;
+  transform:translateX(-50%);
+  width:180px;
+  height:180px;
+  background:#d2b48c;
+  border-radius:50%;
+  box-shadow:0 10px 20px rgba(0,0,0,0.3);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  font-weight:bold;
+}
+
+/* Speech Bubble */
+#bubble{
+  position:absolute;
+  bottom:40%;
+  left:20px;
+  background:white;
+  padding:15px;
+  border-radius:20px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+  font-weight:bold;
+}
+
+/* Energy Bar */
+#energyBox{
+  position:absolute;
+  bottom:5%;
+  left:50%;
+  transform:translateX(-50%);
+  width:80%;
+}
+
+#energyBar{
+  height:20px;
+  background:#ddd;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+#energyFill{
+  height:100%;
+  width:100%;
+  background:green;
+}
+
+/* Buttons */
+button{
+  padding:8px 15px;
+  border:none;
+  border-radius:15px;
+  background:orange;
+  color:white;
+  font-weight:bold;
+  margin-top:5px;
+}
+
+#timer{
+  position:absolute;
+  top:2%;
+  right:10px;
+  background:white;
+  padding:5px 10px;
+  border-radius:10px;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+<div id="timer">24:00:00</div>
+
+<div id="bakery">
+🍞 Fırın
+</div>
+
+<div id="mill">
+🌪️ Değirmen
+</div>
+
+<div id="bubble">
+🌾 <span id="wheat">0</span><br>
+🌪️ <span id="flour">0</span><br>
+🍞 <span id="bread">0</span><br>
+<button onclick="harvest()">Hasat</button>
+<button onclick="makeFlour()">Un</button>
+<button onclick="makeBread()">Pişir</button>
+</div>
+
+<div id="energyBox">
+⚡ Enerji: <span id="energyText">100</span>%
+<div id="energyBar">
+<div id="energyFill"></div>
+</div>
+</div>
+
+</div>
+
+<script>
+
+let wheat=0;
+let flour=0;
+let bread=0;
+let energy=100;
+let level=1;
+let timeLeft=86400; // 24 saat
+
+function saveGame(){
+  localStorage.setItem("bakerySave",
+    JSON.stringify({wheat,flour,bread,energy,level,timeLeft})
+  );
+}
+
+function loadGame(){
+  let data=localStorage.getItem("bakerySave");
+  if(data){
+    let save=JSON.parse(data);
+    wheat=save.wheat;
+    flour=save.flour;
+    bread=save.bread;
+    energy=save.energy;
+    level=save.level;
+    timeLeft=save.timeLeft;
+  }
+}
+
+function harvest(){
+  if(energy>0){
+    wheat+=1*level;
+    energy-=2;
+  }
+  updateUI();
+}
+
+function makeFlour(){
+  if(wheat>=5){
+    wheat-=5;
+    flour+=1*level;
+  }
+  updateUI();
+}
+
+function makeBread(){
+  if(flour>=3){
+    flour-=3;
+    bread+=1*level;
+  }
+  updateUI();
+}
+
+function updateUI(){
+  document.getElementById("wheat").innerText=wheat;
+  document.getElementById("flour").innerText=flour;
+  document.getElementById("bread").innerText=bread;
+  document.getElementById("energyText").innerText=energy;
+  document.getElementById("energyFill").style.width=energy+"%";
+  saveGame();
+}
+
+function updateTimer(){
+  if(timeLeft>0){
+    timeLeft--;
+  }
+  let h=Math.floor(timeLeft/3600);
+  let m=Math.floor((timeLeft%3600)/60);
+  let s=timeLeft%60;
+  document.getElementById("timer").innerText=
+    String(h).padStart(2,'0')+":"+
+    String(m).padStart(2,'0')+":"+
+    String(s).padStart(2,'0');
+}
+
+setInterval(()=>{
+  if(energy<100) energy+=1;
+  updateTimer();
+  updateUI();
+},1000);
+
+loadGame();
+updateUI();
+
+</script>
+
+</body>
+</html>
